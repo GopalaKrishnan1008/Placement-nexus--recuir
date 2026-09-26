@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEXUS-RECRUIT | Tri-Agent Placement Evaluation Platform</title>
+  <!-- Tailwind CSS via Google GStatic or CDN fallback -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              500: '#10b981',
+              600: '#059669',
+            },
+            nexus: {
+              dark: '#0B0F19',
+              card: '#111827',
+              border: '#1F2937',
+              accent: '#6366F1',
+              recruiter: '#38BDF8',
+              tech: '#A855F7',
+              coach: '#F59E0B',
+            }
+          },
+          fontFamily: {
+            mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+            sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @keyframes pulse-slow {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.85; transform: scale(1.02); }
+    }
+    .animate-pulse-slow {
+      animation: pulse-slow 3s infinite ease-in-out;
+    }
+    .glassmorphism {
+      background: rgba(17, 24, 39, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0B0F19;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #374151;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #4B5563;
+    }
+  </style>
+</head>
+<body class="bg-[#0B0F19] text-gray-100 min-h-screen font-sans selection:bg-indigo-500 selection:text-white pb-16">
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="sticky top-0 z-50 glassmorphism border-b border-gray-800/80 px-6 py-3.5 transition-all">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/25">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-200 to-indigo-300">
+              NEXUS-RECRUIT
+            </span>
+            <span class="px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 rounded-full">
+              v2.4 Tri-Agent Engine
+            </span>
+          </div>
+          <p class="text-xs text-gray-400 hidden sm:block">Autonomous Multi-Agent Placement Readiness & Simulation Platform</p>
+        </div>
+      </div>
+
+      <!-- Quick Stats & Agent Badges -->
+      <div class="flex items-center space-x-3">
+        <div class="hidden lg:flex items-center space-x-2 bg-gray-900/80 px-3 py-1.5 rounded-lg border border-gray-800 text-xs">
+          <span class="flex h-2 w-2 relative">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+          <span class="text-gray-300 font-mono">3 Agents Synchronized</span>
+        </div>
+        <button onclick="loadSampleProfile('amazon')" class="text-xs px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-indigo-300 border border-indigo-500/30 transition flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+          Demo: Amazon SDE-1
+        </button>
+        <button onclick="loadSampleProfile('google')" class="text-xs px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-purple-300 border border-purple-500/30 transition hidden sm:inline-flex">
+          Demo: Google SWE
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO & INTRO -->
+  <section class="max-w-7xl mx-auto px-6 pt-8 pb-4">
+    <div class="text-center max-w-3xl mx-auto mb-8">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-medium mb-3">
+        <span>🏆 Prompt Wars Hackathon Innovation</span>
+        <span>•</span>
+        <span>Solving Placement Blindspots with Autonomous AI</span>
+      </div>
+      <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white mb-3">
+        Crack Your Campus Placements <br class="hidden sm:inline" />
+        <span class="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-400">
+          Before Your First Real Rejection
+        </span>
+      </h1>
+      <p class="text-sm sm:text-base text-gray-400">
+        Three specialized AI agents simulate your real interview panel: Recruiter, Tech Lead, and Placement Strategist. Uncover your fatal blindspots and train with real-time adaptive simulations.
+      </p>
+    </div>
+
+    <!-- AGENT STATUS BAR -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+      <div class="glassmorphism p-4 rounded-xl border-l-4 border-l-sky-500 flex items-start space-x-3.5">
+        <div class="w-9 h-9 rounded-lg bg-sky-500/10 text-sky-400 flex items-center justify-center shrink-0 mt-0.5 border border-sky-500/20">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-mono font-bold text-sky-400 uppercase tracking-wide">[AGENT_RECRUITER]</span>
+            <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+          </div>
+          <p class="text-sm font-semibold text-white">VP of Global Campus Hiring</p>
+          <p class="text-xs text-gray-400 mt-0.5">Audits company bar, resume keyword padding, and round 1 screening cutoffs.</p>
+        </div>
+      </div>
+
+      <div class="glassmorphism p-4 rounded-xl border-l-4 border-l-purple-500 flex items-start space-x-3.5">
+        <div class="w-9 h-9 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center shrink-0 mt-0.5 border border-purple-500/20">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-mono font-bold text-purple-400 uppercase tracking-wide">[AGENT_TECH_LEAD]</span>
+            <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+          </div>
+          <p class="text-sm font-semibold text-white">Staff Software Engineer</p>
+          <p class="text-xs text-gray-400 mt-0.5">Evaluates DSA time/space complexity, project architecture, and system trade-offs.</p>
+        </div>
+      </div>
+
+      <div class="glassmorphism p-4 rounded-xl border-l-4 border-l-amber-500 flex items-start space-x-3.5">
+        <div class="w-9 h-9 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center shrink-0 mt-0.5 border border-amber-500/20">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-mono font-bold text-amber-400 uppercase tracking-wide">[AGENT_CAREER_COACH]</span>
+            <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+          </div>
+          <p class="text-sm font-semibold text-white">Elite Placement Strategist</p>
+          <p class="text-xs text-gray-400 mt-0.5">Focuses on candidate psychological confidence, STAR methodology, and prep ROI.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIN WORKSPACE CONTAINER -->
+  <main class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
+    
+    <!-- LEFT PANEL: CANDIDATE PROFILE INPUT FORM (5 cols) -->
+    <div class="lg:col-span-5 space-y-6">
+      <div class="glassmorphism p-6 rounded-2xl border border-gray-800 shadow-xl">
+        <div class="flex items-center justify-between pb-4 border-b border-gray-800">
+          <div>
+            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+              <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+              Candidate Calibration Profile
+            </h2>
+            <p class="text-xs text-gray-400 mt-0.5">Input your target role and preparation metrics</p>
+          </div>
+          <span class="px-2.5 py-1 text-[11px] font-mono rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Step 1 of 3</span>
+        </div>
+
+        <form id="candidateForm" class="mt-5 space-y-4" onsubmit="event.preventDefault(); triggerAudit();">
+          
+          <!-- Target Company & Role Selection -->
+          <div>
+            <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">Target Company & Role</label>
+            <div class="grid grid-cols-2 gap-2 mb-2">
+              <select id="targetCompany" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+                <option value="Amazon SDE-1">Amazon (SDE-1)</option>
+                <option value="Google SWE">Google (Software Engineer)</option>
+                <option value="Microsoft SDE">Microsoft (SDE-1)</option>
+                <option value="TCS Digital">TCS Digital / Prime</option>
+                <option value="Goldman Sachs Analyst">Goldman Sachs (Analyst)</option>
+                <option value="Atlassian SDE">Atlassian (Grad SDE)</option>
+                <option value="Fast-Growing Startup">High-Growth Tech Unicorn</option>
+              </select>
+              <select id="academicYear" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+                <option value="Final Year B.Tech CSE">Final Year CSE / IT</option>
+                <option value="3rd Year B.Tech CSE">3rd Year (Internship)</option>
+                <option value="ECE / Non-CS Branch">ECE / Circuit Branch</option>
+                <option value="Mechanical / Core Branch">Mechanical / Civil</option>
+                <option value="MCA / M.Tech">MCA / M.Tech</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Problem Solving & DSA Level Slider -->
+          <div>
+            <div class="flex justify-between items-center text-xs mb-1">
+              <span class="font-semibold text-gray-300">DSA & Problem Solving Level</span>
+              <span id="dsaValueDisplay" class="font-mono text-indigo-400 font-bold">250+ LC (Mediums)</span>
+            </div>
+            <input type="range" id="dsaSlider" min="20" max="100" value="70" class="w-full h-2 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-indigo-500" oninput="updateSliderLabels()">
+            <div class="flex justify-between text-[10px] text-gray-500 mt-1 font-mono">
+              <span>Beginner (<50 LC)</span>
+              <span>150-300 LC</span>
+              <span>Top Competitive (500+)</span>
+            </div>
+          </div>
+
+          <!-- Core CS Fundamentals Slider -->
+          <div>
+            <div class="flex justify-between items-center text-xs mb-1">
+              <span class="font-semibold text-gray-300">Core CS (OS, DBMS, Networks, OOPs)</span>
+              <span id="coreCsValueDisplay" class="font-mono text-purple-400 font-bold">Moderate (65%)</span>
+            </div>
+            <input type="range" id="coreCsSlider" min="20" max="100" value="65" class="w-full h-2 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-purple-500" oninput="updateSliderLabels()">
+          </div>
+
+          <!-- Project & System Design Depth -->
+          <div>
+            <div class="flex justify-between items-center text-xs mb-1">
+              <span class="font-semibold text-gray-300">Projects Depth & System Architecture</span>
+              <span id="projectValueDisplay" class="font-mono text-sky-400 font-bold">Fullstack Clone (55%)</span>
+            </div>
+            <input type="range" id="projectSlider" min="20" max="100" value="58" class="w-full h-2 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-sky-500" oninput="updateSliderLabels()">
+          </div>
+
+          <!-- Communication & STAR Behavioral -->
+          <div>
+            <div class="flex justify-between items-center text-xs mb-1">
+              <span class="font-semibold text-gray-300">Interview Communication & STAR Storytelling</span>
+              <span id="commValueDisplay" class="font-mono text-amber-400 font-bold">Unrehearsed (50%)</span>
+            </div>
+            <input type="range" id="commSlider" min="20" max="100" value="50" class="w-full h-2 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-amber-500" oninput="updateSliderLabels()">
+          </div>
+
+          <!-- Resume / Skills Summary Textarea -->
+          <div>
+            <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">Resume Projects & Tech Stack</label>
+            <textarea id="resumeSummary" rows="2" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-gray-200 focus:outline-none focus:border-indigo-500 font-mono" placeholder="e.g., Java, C++, React, Node.js, MongoDB. Built an E-commerce store with Stripe auth. Solved 250 problems on Leetcode.">Java, C++, React, Node.js, MongoDB, basic SQL. Built MERN E-Commerce with JWT & Stripe. Solved ~250 LeetCode problems (Arrays, Trees, Graphs).</textarea>
+          </div>
+
+          <!-- Self-Assessed Primary Weakness -->
+          <div>
+            <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5">Candidate Primary Anxiety / Weakness</label>
+            <select id="primaryWeakness" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+              <option value="Hard DP & Graph Optimization">Hard Dynamic Programming & Graph Optimizations</option>
+              <option value="System Design & Concurrency Probing">System Design, Database Locking & Concurrency</option>
+              <option value="Defending Resume Projects Under Cross-Exam">Defending Tutorial Projects Against In-Depth Probing</option>
+              <option value="Behavioral / STAR Leadership Principles">STAR Method & Behavioral / Leadership Rounds</option>
+              <option value="Aptitude & Speed Round Filtration">Aptitude & Speed Screening Cutoffs</option>
+            </select>
+          </div>
+
+          <!-- SUBMIT / TRIGGER BUTTON -->
+          <button type="submit" id="auditBtn" class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 transition duration-200 cursor-pointer">
+            <svg class="w-5 h-5 animate-spin hidden" id="spinnerIcon" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+            </svg>
+            <span id="auditBtnText">Run Tri-Agent Autonomous Audit</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+          </button>
+        </form>
+      </div>
+
+      <!-- LIVE TERMINAL DELIBERATION STREAM -->
+      <div class="glassmorphism p-5 rounded-2xl border border-gray-800 font-mono text-xs overflow-hidden">
+        <div class="flex items-center justify-between pb-3 border-b border-gray-800">
+          <div class="flex items-center space-x-2">
+            <span class="w-3 h-3 rounded-full bg-red-500/80 inline-block"></span>
+            <span class="w-3 h-3 rounded-full bg-yellow-500/80 inline-block"></span>
+            <span class="w-3 h-3 rounded-full bg-green-500/80 inline-block"></span>
+            <span class="text-gray-400 text-[11px] ml-2 font-mono">nexus-deliberation-stream.log</span>
+          </div>
+          <span class="text-[10px] text-emerald-400 animate-pulse">● LIVE CONTEXT</span>
+        </div>
+        <div id="terminalStream" class="h-44 overflow-y-auto space-y-2 pt-3 pr-2 text-gray-300 leading-relaxed">
+          <div class="text-gray-500">// NEXUS-RECRUIT engine initialized in standby.</div>
+          <div class="text-sky-400">[AGENT_RECRUITER]: Ready to parse resume claims against actual company hiring rubrics.</div>
+          <div class="text-purple-400">[AGENT_TECH_LEAD]: Ready to evaluate complexity bounds, LLD abstractions, and edge cases.</div>
+          <div class="text-amber-400">[AGENT_CAREER_COACH]: Ready to compute Placement Readiness Index (PRI) and 7-day sprint.</div>
+          <div class="text-gray-400">Waiting for candidate submission or sample trigger...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL: EXECUTIVE AUDIT REPORT & SIMULATION ROOM (7 cols) -->
+    <div class="lg:col-span-7 space-y-6">
+      
+      <!-- AUDIT HEADER & PLACEMENT READINESS SCORECARD -->
+      <div id="auditReportCard" class="glassmorphism p-6 rounded-2xl border border-gray-800 shadow-2xl relative overflow-hidden transition-all duration-300">
+        
+        <!-- Background Ambient Glow -->
+        <div class="absolute -top-24 -right-24 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-gray-800">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-mono text-gray-400 uppercase tracking-widest">Executive Placement Audit</span>
+              <span id="tierBadge" class="px-2.5 py-0.5 text-xs font-bold font-mono rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                B-Tier [Borderline]
+              </span>
+            </div>
+            <h2 id="reportTargetTitle" class="text-2xl font-black text-white mt-1">Amazon • SDE-1</h2>
+            <p class="text-xs text-gray-400 mt-0.5">Calibrated against historical campus hiring bars & interviewer debriefs</p>
+          </div>
+
+          <!-- PRI Radial / Score Circle -->
+          <div class="flex items-center space-x-3 bg-gray-900/90 p-3 rounded-xl border border-gray-800 shrink-0">
+            <div class="relative w-16 h-16 flex items-center justify-center">
+              <svg class="w-16 h-16 transform -rotate-90">
+                <circle cx="32" cy="32" r="28" stroke="currentColor" stroke-width="5" class="text-gray-800" fill="transparent" />
+                <circle id="priCircleProgress" cx="32" cy="32" r="28" stroke="currentColor" stroke-width="5" class="text-amber-400 transition-all duration-1000 ease-out" stroke-dasharray="175.9" stroke-dashoffset="65" stroke-linecap="round" fill="transparent" />
+              </svg>
+              <div class="absolute flex flex-col items-center">
+                <span id="priScoreNumber" class="text-lg font-black text-white font-mono leading-none">63</span>
+                <span class="text-[9px] font-mono text-gray-400 uppercase">PRI</span>
+              </div>
+            </div>
+            <div>
+              <div class="text-[11px] font-semibold text-gray-300">Readiness Index</div>
+              <div id="hiringLikelihood" class="text-xs font-medium text-amber-400">42% First-Round Pass</div>
+              <div class="text-[10px] text-gray-500">Industry Cutoff: 75+</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 1. "WHERE YOU STAND" — BENCHMARK MATRIX -->
+        <div class="mt-6">
+          <h3 class="text-sm font-bold uppercase tracking-wider text-gray-200 flex items-center gap-2 mb-3">
+            <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
+            1. 📍 Where You Stand — Benchmark Radar
+          </h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs border border-gray-800 rounded-lg overflow-hidden">
+              <thead class="bg-gray-900/90 text-gray-400 font-mono uppercase text-[10px]">
+                <tr>
+                  <th class="py-2.5 px-3">Dimension</th>
+                  <th class="py-2.5 px-3">Your Score</th>
+                  <th class="py-2.5 px-3">Company Bar</th>
+                  <th class="py-2.5 px-3">Hiring Panel Verdict</th>
+                </tr>
+              </thead>
+              <tbody id="matrixTableBody" class="divide-y divide-gray-800/80 text-gray-300">
+                <!-- Rows injected dynamically via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 2. "WHAT YOU MUST FIX" — THE FATAL BLINDSPOTS -->
+        <div class="mt-6">
+          <h3 class="text-sm font-bold uppercase tracking-wider text-gray-200 flex items-center gap-2 mb-3">
+            <span class="w-2 h-2 rounded-full bg-rose-400"></span>
+            2. 🚨 What You Must Fix — Fatal Blindspots
+          </h3>
+          <div id="blindspotsContainer" class="space-y-3">
+            <!-- Blindspots injected dynamically -->
+          </div>
+        </div>
+
+        <!-- 3. "WHAT & HOW TO PREPARE" — 7-DAY PRECISION SPRINT -->
+        <div class="mt-6">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-gray-200 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+              3. 🎯 What & How to Prepare — 7-Day Precision Sprint
+            </h3>
+            <span class="text-[11px] text-emerald-400 font-mono bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">High ROI</span>
+          </div>
+
+          <!-- Sprint Day Tabs -->
+          <div class="grid grid-cols-4 gap-1.5 p-1 bg-gray-900 rounded-xl border border-gray-800 text-xs font-medium mb-3">
+            <button onclick="switchSprintTab(1)" id="tabBtn1" class="sprint-tab py-1.5 rounded-lg bg-indigo-600 text-white font-semibold transition">Days 1–2</button>
+            <button onclick="switchSprintTab(2)" id="tabBtn2" class="sprint-tab py-1.5 rounded-lg text-gray-400 hover:text-white transition">Days 3–4</button>
+            <button onclick="switchSprintTab(3)" id="tabBtn3" class="sprint-tab py-1.5 rounded-lg text-gray-400 hover:text-white transition">Days 5–6</button>
+            <button onclick="switchSprintTab(4)" id="tabBtn4" class="sprint-tab py-1.5 rounded-lg text-gray-400 hover:text-white transition">Day 7 (Mock)</button>
+          </div>
+
+          <!-- Sprint Content Box -->
+          <div id="sprintContent" class="p-4 rounded-xl bg-gray-900/60 border border-gray-800 text-xs text-gray-300 space-y-2">
+            <!-- Dynamic Sprint details -->
+          </div>
+        </div>
+
+        <!-- 4. LIVE INTERACTIVE SIMULATION ROOM -->
+        <div class="mt-6 pt-6 border-t border-gray-800">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-white flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+              4. ⚡ Live Diagnostic Simulation Round
+            </h3>
+            <span class="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">
+              Interactive Test
+            </span>
+          </div>
+          <p class="text-xs text-gray-400 mb-3">
+            The panel has formulated a scenario targeting your single biggest vulnerability. Submit your response to receive real-time scoring.
+          </p>
+
+          <!-- The Live Question Card -->
+          <div class="p-4 rounded-xl bg-indigo-950/30 border border-indigo-500/30 mb-3">
+            <div class="flex items-center justify-between text-xs text-indigo-400 font-mono mb-1.5">
+              <span id="simInterviewerTag">[AGENT_TECH_LEAD] Cross-Examination</span>
+              <span>Target: Concurrency & Lock Contention</span>
+            </div>
+            <p id="simQuestionText" class="text-sm font-medium text-gray-100 leading-relaxed">
+              "I see your E-commerce project handles order processing and inventory. Let's imagine flash sale day: 50,000 customers are trying to buy the final 5 units of a discounted laptop at the exact same second. How do you prevent inventory overselling at the database layer without grinding database throughput to zero?"
+            </p>
+            <div class="mt-2.5 flex items-center gap-2 text-[11px] text-gray-400">
+              <span class="font-semibold text-indigo-300">💡 Strategy Hint:</span>
+              <span id="simHintText">Compare Pessimistic Locking (`SELECT FOR UPDATE`) vs Optimistic Version Locking vs Redis distributed locks.</span>
+            </div>
+          </div>
+
+          <!-- Answer Textarea & Live Evaluator -->
+          <div class="space-y-2">
+            <textarea id="candidateAnswer" rows="3" class="w-full bg-gray-900 border border-gray-700 rounded-xl p-3 text-xs text-gray-200 focus:outline-none focus:border-indigo-500 font-mono" placeholder="Type your structured answer here (explain trade-offs, architecture, and exact locking mechanisms)..."></textarea>
+            
+            <div class="flex items-center justify-between gap-3">
+              <div class="flex items-center gap-2">
+                <button type="button" onclick="insertSampleTopAnswer()" class="text-[11px] px-2.5 py-1 rounded bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 transition">
+                  Paste "Top 1% Candidate" Response
+                </button>
+                <button type="button" onclick="insertSampleWeakAnswer()" class="text-[11px] px-2.5 py-1 rounded bg-gray-800 hover:bg-gray-700 text-rose-300 border border-rose-900/50 transition">
+                  Paste "Average Candidate" Response
+                </button>
+              </div>
+              <button onclick="evaluateCandidateAnswer()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition shadow-md shadow-indigo-600/30 flex items-center gap-1.5">
+                <span>Evaluate Answer</span>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- REAL-TIME INTERVIEW FEEDBACK DRAWER -->
+          <div id="simFeedbackDrawer" class="hidden mt-4 p-4 rounded-xl border border-gray-800 bg-gray-900/90 text-xs space-y-3 transition-all">
+            <!-- Dynamically populated feedback -->
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- JAVASCRIPT LOGIC ENGINE -->
+  <script>
+    // State
+    let currentPRI = 63;
+    let currentSprintData = {};
+
+    // Preset Profiles for 1-Click Demo in Hackathon
+    const sampleProfiles = {
+      amazon: {
+        company: "Amazon SDE-1",
+        year: "Final Year B.Tech CSE",
+        dsa: 72,
+        coreCs: 65,
+        project: 58,
+        comm: 50,
+        resume: "Java, C++, React, Node.js, MongoDB, basic SQL. Built MERN E-Commerce with JWT & Stripe. Solved ~250 LeetCode problems (Arrays, Trees, Graphs).",
+        weakness: "System Design & Concurrency Probing"
+      },
+      google: {
+        company: "Google SWE",
+        year: "Final Year B.Tech CSE",
+        dsa: 88,
+        coreCs: 82,
+        project: 70,
+        comm: 65,
+        resume: "C++, Python, Go. 550+ LeetCode (Knight/Guardian). Custom distributed key-value store with Raft consensus, WebRTC streaming engine.",
+        weakness: "Hard DP & Graph Optimization"
+      }
+    };
+
+    function loadSampleProfile(type) {
+      const p = sampleProfiles[type];
+      if (!p) return;
+      document.getElementById('targetCompany').value = p.company;
+      document.getElementById('academicYear').value = p.year;
+      document.getElementById('dsaSlider').value = p.dsa;
+      document.getElementById('coreCsSlider').value = p.coreCs;
+      document.getElementById('projectSlider').value = p.project;
+      document.getElementById('commSlider').value = p.comm;
+      document.getElementById('resumeSummary').value = p.resume;
+      document.getElementById('primaryWeakness').value = p.weakness;
+      updateSliderLabels();
+      triggerAudit();
+    }
+
+    function updateSliderLabels() {
+      const dsa = document.getElementById('dsaSlider').value;
+      const core = document.getElementById('coreCsSlider').value;
+      const proj = document.getElementById('projectSlider').value;
+      const comm = document.getElementById('commSlider').value;
+
+      document.getElementById('dsaValueDisplay').innerText = dsa >= 85 ? `Elite (${dsa}/100)` : dsa >= 65 ? `Intermediate (${dsa}/100)` : `Beginner (${dsa}/100)`;
+      document.getElementById('coreCsValueDisplay').innerText = `${core}/100 (${core >= 75 ? 'Strong' : 'Moderate'})`;
+      document.getElementById('projectValueDisplay').innerText = `${proj}/100 (${proj >= 75 ? 'Production' : 'Tutorial Tier'})`;
+      document.getElementById('commValueDisplay').innerText = `${comm}/100 (${comm >= 75 ? 'Polished STAR' : 'Unrehearsed'})`;
+    }
+
+    function logTerminal(message, type = 'info') {
+      const terminal = document.getElementById('terminalStream');
+      const div = document.createElement('div');
+      
+      const timestamp = new Date().toLocaleTimeString();
+      let colorClass = 'text-gray-300';
+      if (type === 'recruiter') colorClass = 'text-sky-400';
+      if (type === 'tech') colorClass = 'text-purple-400';
+      if (type === 'coach') colorClass = 'text-amber-400';
+      if (type === 'calc') colorClass = 'text-emerald-400 font-bold';
+      if (type === 'warn') colorClass = 'text-rose-400';
+
+      div.className = `${colorClass} text-[11px] leading-tight`;
+      div.innerHTML = `<span class="text-gray-600">[${timestamp}]</span> ${message}`;
+      terminal.appendChild(div);
+      terminal.scrollTop = terminal.scrollHeight;
+    }
+
+    function triggerAudit() {
+      const company = document.getElementById('targetCompany').value;
+      const dsa = parseInt(document.getElementById('dsaSlider').value);
+      const core = parseInt(document.getElementById('coreCsSlider').value);
+      const proj = parseInt(document.getElementById('projectSlider').value);
+      const comm = parseInt(document.getElementById('commSlider').value);
+      const weakness = document.getElementById('primaryWeakness').value;
+
+      // Start animation
+      const btn = document.getElementById('auditBtn');
+      const btnText = document.getElementById('auditBtnText');
+      const spinner = document.getElementById('spinnerIcon');
+      btn.disabled = true;
+      spinner.classList.remove('hidden');
+      btnText.innerText = "Synchronizing Tri-Agents...";
+
+      // Clear terminal with new deliberation session
+      logTerminal(`--- START DELIBERATION PROTOCOL FOR [${company}] ---`);
+      
+      setTimeout(() => {
+        logTerminal(`[AGENT_RECRUITER]: Reviewing candidate profile against 2026 hiring debriefs for ${company}...`, 'recruiter');
+      }, 300);
+
+      setTimeout(() => {
+        logTerminal(`[AGENT_TECH_LEAD]: Parsing code competence: DSA=${dsa}, Project=${proj}. Assessing blindspot: "${weakness}"...`, 'tech');
+      }, 700);
+
+      setTimeout(() => {
+        // PRI calculation
+        const calculatedPRI = Math.round((core * 0.25) + (dsa * 0.35) + (proj * 0.25) + (comm * 0.15));
+        currentPRI = calculatedPRI;
+        logTerminal(`[AGENT_CAREER_COACH]: Running Weighted Formula: (${core}*0.25) + (${dsa}*0.35) + (${proj}*0.25) + (${comm}*0.15) = PRI: ${calculatedPRI}`, 'calc');
+        
+        let tier = "B-Tier [Borderline]";
+        let badgeColor = "bg-amber-500/20 text-amber-400 border-amber-500/30";
+        if (calculatedPRI >= 85) {
+          tier = "S-Tier [Top 1% Hire]";
+          badgeColor = "bg-emerald-500/20 text-emerald-400 border-emerald-500/30";
+        } else if (calculatedPRI >= 75) {
+          tier = "A-Tier [Clear Hire]";
+          badgeColor = "bg-indigo-500/20 text-indigo-400 border-indigo-500/30";
+        } else if (calculatedPRI < 55) {
+          tier = "C-Tier [Rejection Risk]";
+          badgeColor = "bg-rose-500/20 text-rose-400 border-rose-500/30";
+        }
+
+        logTerminal(`[AGENT_RECRUITER]: Deliberation Consensus reached: Candidate Placed in ${tier}.`, 'recruiter');
+        
+        // Update UI
+        renderAuditReport(company, calculatedPRI, tier, badgeColor, dsa, core, proj, comm, weakness);
+
+        btn.disabled = false;
+        spinner.classList.add('hidden');
+        btnText.innerText = "Re-Run Tri-Agent Audit";
+      }, 1300);
+    }
+
+    function renderAuditReport(company, pri, tier, badgeClass, dsa, core, proj, comm, weakness) {
+      // 1. Header
+      document.getElementById('reportTargetTitle').innerText = company;
+      const tierBadge = document.getElementById('tierBadge');
+      tierBadge.className = `px-2.5 py-0.5 text-xs font-bold font-mono rounded-full border ${badgeClass}`;
+      tierBadge.innerText = tier;
+
+      document.getElementById('priScoreNumber').innerText = pri;
+      const passRate = Math.min(95, Math.max(12, Math.round(pri * 0.85)));
+      document.getElementById('hiringLikelihood').innerText = `${passRate}% First-Round Pass`;
+
+      // Gauge offset (stroke-dasharray = 175.9)
+      const offset = 175.9 - (175.9 * (pri / 100));
+      const circle = document.getElementById('priCircleProgress');
+      circle.style.strokeDashoffset = offset;
+      if (pri >= 80) circle.setAttribute('class', 'text-emerald-400 transition-all duration-1000');
+      else if (pri >= 65) circle.setAttribute('class', 'text-amber-400 transition-all duration-1000');
+      else circle.setAttribute('class', 'text-rose-500 transition-all duration-1000');
+
+      // 2. Matrix Table
+      // Target Bars depending on company
+      let targetDsa = 85, targetCore = 75, targetProj = 80, targetComm = 85;
+      if (company.includes("Google")) { targetDsa = 92; targetCore = 80; targetProj = 85; targetComm = 80; }
+      else if (company.includes("TCS")) { targetDsa = 65; targetCore = 60; targetProj = 55; targetComm = 65; }
+
+      const getStatus = (cand, target) => {
+        if (cand >= target) return `<span class="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Ahead / At Par</span>`;
+        if (cand >= target - 10) return `<span class="px-2 py-0.5 rounded text-[10px] font-mono bg-amber-500/20 text-amber-400 border border-amber-500/30">⚠️ Minor Gap</span>`;
+        return `<span class="px-2 py-0.5 rounded text-[10px] font-mono bg-rose-500/20 text-rose-400 border border-rose-500/30">🚨 Critical Risk</span>`;
+      };
+
+      const tableBody = document.getElementById('matrixTableBody');
+      tableBody.innerHTML = `
+        <tr class="hover:bg-gray-800/40 transition">
+          <td class="py-2 px-3 font-medium text-white">Data Structures & Algorithms</td>
+          <td class="py-2 px-3 font-mono">${dsa}/100</td>
+          <td class="py-2 px-3 font-mono text-gray-400">${targetDsa}/100</td>
+          <td class="py-2 px-3">${getStatus(dsa, targetDsa)}</td>
+        </tr>
+        <tr class="hover:bg-gray-800/40 transition">
+          <td class="py-2 px-3 font-medium text-white">Core CS (OS, DBMS, Networks)</td>
+          <td class="py-2 px-3 font-mono">${core}/100</td>
+          <td class="py-2 px-3 font-mono text-gray-400">${targetCore}/100</td>
+          <td class="py-2 px-3">${getStatus(core, targetCore)}</td>
+        </tr>
+        <tr class="hover:bg-gray-800/40 transition">
+          <td class="py-2 px-3 font-medium text-white">Project Depth & Architecture</td>
+          <td class="py-2 px-3 font-mono">${proj}/100</td>
+          <td class="py-2 px-3 font-mono text-gray-400">${targetProj}/100</td>
+          <td class="py-2 px-3">${getStatus(proj, targetProj)}</td>
+        </tr>
+        <tr class="hover:bg-gray-800/40 transition">
+          <td class="py-2 px-3 font-medium text-white">Interview Communication & STAR</td>
+          <td class="py-2 px-3 font-mono">${comm}/100</td>
+          <td class="py-2 px-3 font-mono text-gray-400">${targetComm}/100</td>
+          <td class="py-2 px-3">${getStatus(comm, targetComm)}</td>
+        </tr>
+      `;
+
+      // 3. Blindspots
+      const blindspotsContainer = document.getElementById('blindspotsContainer');
+      blindspotsContainer.innerHTML = `
+        <div class="p-3.5 rounded-xl bg-gray-900/80 border border-rose-900/40 text-xs">
+          <div class="flex items-center justify-between text-rose-400 font-bold mb-1">
+            <span>❌ Fatal Gap 1: Resume Project Cross-Examination Vulnerability</span>
+            <span class="text-[10px] font-mono uppercase bg-rose-500/10 px-1.5 py-0.5 rounded">High Probability</span>
+          </div>
+          <p class="text-gray-300">
+            Interviewers will ask: <em>"What happens if 10,000 requests hit your database checkout at once?"</em> Saying <em>"Node.js handles it asynchronously"</em> will result in an immediate down-leveling. They will probe race conditions and DB row locks.
+          </p>
+        </div>
+        <div class="p-3.5 rounded-xl bg-gray-900/80 border border-amber-900/40 text-xs">
+          <div class="flex items-center justify-between text-amber-400 font-bold mb-1">
+            <span>❌ Fatal Gap 2: ${weakness}</span>
+            <span class="text-[10px] font-mono uppercase bg-amber-500/10 px-1.5 py-0.5 rounded">Candidate Stated</span>
+          </div>
+          <p class="text-gray-300">
+            In ${company} rounds, interviewers deliberately change space constraints (e.g. from O(N) to O(1) auxiliary memory) to test if you memorized solutions or understand the underlying state-space transitions.
+          </p>
+        </div>
+        <div class="p-3.5 rounded-xl bg-gray-900/80 border border-indigo-900/40 text-xs">
+          <div class="flex items-center justify-between text-indigo-400 font-bold mb-1">
+            <span>❌ Fatal Gap 3: Unstructured STAR Storytelling & Lack of Metrics</span>
+            <span class="text-[10px] font-mono uppercase bg-indigo-500/10 px-1.5 py-0.5 rounded">Bar Raiser Trap</span>
+          </div>
+          <p class="text-gray-300">
+            Candidate behavioral answers rely heavily on passive "We did this" rather than extreme personal ownership: <em>"I decided X because of Y trade-off, resulting in 35% latency drop."</em>
+          </p>
+        </div>
+      `;
+
+      // 4. Update Sprint Plan
+      currentSprintData = {
+        1: {
+          title: "Days 1–2: Foundation & High-Frequency Patterns",
+          tasks: [
+            "Master Top 25 ${company} recurring DSA patterns (Sliding Window, Monotonic Queue, Binary Search on Answer).",
+            "Write solutions in a plain notepad with zero IDE auto-completion; verbalize Space/Time complexities before writing code.",
+            "Drill DBMS Indexing (B-Tree vs Hash), ACID transactions, and Concurrency anomaly types (Dirty Read, Phantom Read)."
+          ]
+        },
+        2: {
+          title: "Days 3–4: Company-Specific Low-Level Design & Systems",
+          tasks: [
+            "Implement 2 classic OOP Design Patterns: Factory Pattern & Strategy Pattern in Java/C++.",
+            "Architect a scalable Rate Limiter (Token Bucket algorithm) and Cart Checkout with Redis distributed locking.",
+            "Review OS Process vs Thread scheduling, Deadlocks, Mutex vs Semaphore."
+          ]
+        },
+        3: {
+          title: "Days 5–6: Project Defense & STAR Formulation",
+          tasks: [
+            "Prepare 5 concrete STAR stories mapped to company values (Extreme Ownership, Customer Obsession, Deep Dive).",
+            "Formulate 1 architectural failure story: 'A time my code caused a bug/bottleneck and what I learned.'",
+            "Audit your resume: ensure every bullet point has a quantifiable number (e.g., ms, %, users)."
+          ]
+        },
+        4: {
+          title: "Day 7: Full Pressure Mock Simulation Day",
+          tasks: [
+            "1 Timed 70-Minute Coding Drill: 2 LeetCode Mediums without looking at discussion boards.",
+            "Record your voice answering: 'Walk me through your most complex project' in under 2 minutes.",
+            "Check for filler words ('uhm', 'like', 'actually') and enforce crisp professional cadence."
+          ]
+        }
+      };
+
+      switchSprintTab(1);
+
+      // 5. Update Simulation Question based on weakness
+      updateSimulationQuestion(weakness, company);
+    }
+
+    function switchSprintTab(tabNumber) {
+      document.querySelectorAll('.sprint-tab').forEach((btn, index) => {
+        if (index + 1 === tabNumber) {
+          btn.className = "sprint-tab py-1.5 rounded-lg bg-indigo-600 text-white font-semibold transition";
+        } else {
+          btn.className = "sprint-tab py-1.5 rounded-lg text-gray-400 hover:text-white transition";
+        }
+      });
+
+      const data = currentSprintData[tabNumber] || {
+        title: "Sprint Tasks",
+        tasks: ["Complete high-priority revision drills."]
+      };
+
+      const container = document.getElementById('sprintContent');
+      container.innerHTML = `
+        <div class="font-bold text-white text-xs mb-1.5 flex items-center justify-between">
+          <span>${data.title}</span>
+          <span class="text-indigo-400 font-mono text-[10px]">Active Sprint Module</span>
+        </div>
+        <ul class="space-y-1.5 list-disc list-inside text-gray-300">
+          ${data.tasks.map(t => `<li class="leading-relaxed">${t}</li>`).join('')}
+        </ul>
+      `;
+    }
+
+    function updateSimulationQuestion(weakness, company) {
+      const qText = document.getElementById('simQuestionText');
+      const hint = document.getElementById('simHintText');
+      const tag = document.getElementById('simInterviewerTag');
+
+      if (weakness.includes("Dynamic Programming")) {
+        tag.innerText = "[AGENT_TECH_LEAD] Algorithmic Interrogation";
+        qText.innerText = `"${company} technical screen: You are given an array of flight ticket costs and travel days. Propose the optimal subproblem recurrence relation. How would you reduce auxiliary space from O(N) to O(30) sliding window, and what edge cases trigger index out of bounds?"`;
+        hint.innerText = "State the base case, state transition array DP[i], and show how memoization saves redundant recursive branches.";
+      } else if (weakness.includes("STAR") || weakness.includes("Behavioral")) {
+        tag.innerText = "[AGENT_RECRUITER] Bar Raiser Interrogation";
+        qText.innerText = `"Tell me about a high-stakes disagreement you had with a teammate or project lead regarding a technical decision. How did you challenge them, what data did you present, and what was the quantifiable outcome?"`;
+        hint.innerText = "Structure: 15% Situation, 15% Task, 50% Action (what YOU specifically did), 20% Result (metrics & metrics).";
+      } else {
+        tag.innerText = "[AGENT_TECH_LEAD] Cross-Examination";
+        qText.innerText = `"I see your E-commerce project handles order processing and inventory. Let's imagine flash sale day: 50,000 customers are trying to buy the final 5 units of a discounted laptop at the exact same second. How do you prevent inventory overselling at the database layer without grinding database throughput to zero?"`;
+        hint.innerText = "Compare Pessimistic Locking (`SELECT FOR UPDATE`) vs Optimistic Version Locking vs Redis distributed locks.";
+      }
+
+      // Reset feedback drawer
+      document.getElementById('simFeedbackDrawer').classList.add('hidden');
+      document.getElementById('candidateAnswer').value = '';
+    }
+
+    function insertSampleTopAnswer() {
+      document.getElementById('candidateAnswer').value = 
+`To prevent overselling under high concurrency (50k requests for 5 items), I would use a 2-tier architectural strategy:
+
+1. Redis In-Memory Pre-Deduction (Throughput Layer):
+- Store inventory in Redis: \`SET laptop_stock 5\`.
+- Use an atomic Lua script executing \`DECRBY laptop_stock 1\`. If the returned value is < 0, instantly reject the request in memory (< 2ms) without touching the SQL database.
+
+2. Database Persistence Layer (Consistency):
+- For the 5 successful requests, queue order jobs via a message broker (RabbitMQ / SQS) with an idempotency key to process checkout asynchronously.
+- In PostgreSQL/MySQL, execute an Optimistic Lock query:
+  UPDATE products SET stock = stock - 1, version = version + 1 WHERE id = 101 AND version = @old_version AND stock > 0;
+- If rows affected == 0, rollback and release the Redis lock.
+
+Trade-off: Prioritizes 99.9% read/reject throughput at Redis while strictly guaranteeing zero overselling at the ACID DB layer.`;
+    }
+
+    function insertSampleWeakAnswer() {
+      document.getElementById('candidateAnswer').value = 
+`In my Node.js project, Node is asynchronous and single-threaded with an event loop, so it handles multiple users smoothly. When someone clicks checkout, I will check if \`stock > 0\` with a Mongoose query, and if it is, I will do \`product.stock -= 1\` and call \`product.save()\`. This will prevent negative inventory.`;
+    }
+
+    function evaluateCandidateAnswer() {
+      const ans = document.getElementById('candidateAnswer').value.trim();
+      const drawer = document.getElementById('simFeedbackDrawer');
+      if (!ans) {
+        alert("Please write or paste an answer first to evaluate!");
+        return;
+      }
+
+      drawer.classList.remove('hidden');
+
+      const isHighQuality = ans.includes("Redis") || ans.includes("Optimistic") || ans.includes("Pessimistic") || ans.includes("atomic") || ans.includes("Lua");
+
+      if (isHighQuality) {
+        drawer.innerHTML = `
+          <div class="flex items-center justify-between pb-2 border-b border-gray-800">
+            <span class="text-emerald-400 font-bold font-mono uppercase flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              Verdict: Strong Hire (92/100)
+            </span>
+            <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20 font-mono">Panel Consensus</span>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-gray-300">
+            <div>
+              <span class="text-sky-400 font-semibold font-mono">[AGENT_RECRUITER]:</span>
+              <p class="mt-0.5 text-[11px]">Clear, senior-level articulation. Immediately separated in-memory validation from DB write traffic. Demonstrates real engineering judgment.</p>
+            </div>
+            <div>
+              <span class="text-purple-400 font-semibold font-mono">[AGENT_TECH_LEAD]:</span>
+              <p class="mt-0.5 text-[11px]">Spot on. Atomic Lua scripts with Optimistic versioning prevents database lock contention. Strong understanding of idempotency.</p>
+            </div>
+          </div>
+          <div class="p-2.5 rounded bg-emerald-950/40 border border-emerald-500/30 text-[11px] text-emerald-300">
+            👉 <strong>Immediate Placement Boost:</strong> PRI score upgraded by +6 points for Technical Architecture!
+          </div>
+        `;
+        logTerminal(`[LIVE_EVALUATOR]: Simulation scored 92/100! Candidate cleared the bar for ${document.getElementById('targetCompany').value}.`, 'calc');
+      } else {
+        drawer.innerHTML = `
+          <div class="flex items-center justify-between pb-2 border-b border-gray-800">
+            <span class="text-rose-400 font-bold font-mono uppercase flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+              Verdict: Critical Rejection (34/100)
+            </span>
+            <span class="text-[10px] bg-rose-500/10 text-rose-400 px-2 py-0.5 rounded border border-rose-500/20 font-mono">Instant Reject</span>
+          </div>
+          <div class="space-y-2 text-gray-300">
+            <div>
+              <span class="text-purple-400 font-semibold font-mono">[AGENT_TECH_LEAD] Debrief:</span>
+              <p class="mt-0.5 text-[11px] text-rose-200">
+                <strong>Classic Race Condition:</strong> Checking \`stock > 0\` followed by an asynchronous \`product.save()\` has a check-then-act vulnerability. 50,000 parallel requests will all read \`stock = 5\` at the same time before any save finishes, causing inventory to become <strong>-49,995</strong>.
+              </p>
+            </div>
+            <div class="p-2.5 rounded bg-gray-800/90 border border-gray-700 text-[11px]">
+              <span class="text-amber-400 font-semibold font-mono">[AGENT_CAREER_COACH] Prescription:</span>
+              <p class="mt-0.5 text-gray-300">Revise Database Isolation Levels and atomic increments. Do not state that Node.js being single-threaded prevents distributed database race conditions.</p>
+            </div>
+          </div>
+        `;
+        logTerminal(`[LIVE_EVALUATOR]: Candidate response triggered Fatal Race Condition vulnerability. Scored 34/100.`, 'warn');
+      }
+    }
+
+    // Initialize on load
+    window.addEventListener('DOMContentLoaded', () => {
+      updateSliderLabels();
+      triggerAudit();
+    });
+  </script>
+</body>
+</html>
